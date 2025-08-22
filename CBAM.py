@@ -17,7 +17,7 @@ class ChannelAttention(nn.Module):
         max_out=self.fc(self.max_pool(x).squeeze(-1).squeeze(-1))
         out=avg_out+max_out
         return self.sigmoid(out).unsqueeze(-1).unsqueeze(-1)
-##  
+## Spatial Attention Module of CBAM 
 class SpatialAttention(nn.Module):
     def __init__(self, kernel_size=7):
        super().__init__()
