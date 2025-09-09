@@ -10,7 +10,7 @@ class ChannelAttention(nn.Module):
             nn.Linear(channel, channel // reduction, bias=False),
             nn.ReLU(),
             nn.Linear(channel // reduction, channel, bias=False)
-            )
+        )
         self.sigmoid=nn.Sigmoid()
     def forward(self, x):
         avg_out=self.fc(self.avg_pool(x).squeeze(-1).squeeze(-1))
@@ -31,3 +31,16 @@ class SpatialAttention(nn.Module):
        x_concat=torch.cat([avg_out, max_out], dim=1)
        out=self.conv1(x_concat)
        return self.sigmoid(out)
+class CBAMBlock(nn.Module):
+    def __init__(self, channel, reduction=16, kernel_size=7):
+        super().__init__()
+        self.CA=ChannelAttention(channel, reduction)
+        self.SA=SpatialAttention(kernel_size)
+    def forward(self, x):
+        # Channel Attention
+        CA_map=self.CA(x)
+        x=x*CA_map
+        #Spatial Attention
+        SA_map=self.SA(x)
+        x=x*SA_map
+        return x
